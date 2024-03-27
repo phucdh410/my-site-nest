@@ -16,6 +16,7 @@ import { User } from './modules/users/users.entity';
       database: 'my-site',
       entities: [User],
       synchronize: true,
+      retryAttempts: 1,
     }),
     AuthModule,
   ],
