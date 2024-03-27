@@ -1,36 +1,19 @@
-import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginRequestDto } from './dtos';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(
-    @Body('username') username: string,
-    @Body('password') password: string,
-  ) {
-    try {
-      const user = await this.authService.validateUser(username, password);
+  async login(@Body() request: LoginRequestDto) {
+    const user = await this.authService.validateUser(request);
 
-      if (!user) {
-        throw new HttpException(
-          'Invalid username or password',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return { message: 'Login successful', user };
-    } catch (error) {
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    if (!user) {
+      throw new UnauthorizedException();
     }
+
+    return this.authService.login(user);
   }
 }
