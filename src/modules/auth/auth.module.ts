@@ -5,12 +5,10 @@ import { UserEntity } from 'src/entities';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity]),
-    PassportModule.register({ defaultStrategy: 'local' }),
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
@@ -18,7 +16,7 @@ import { PassportModule } from '@nestjs/passport';
     }),
   ],
   providers: [AuthService],
-  exports: [AuthService, PassportModule],
+  exports: [AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}

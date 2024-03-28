@@ -3,11 +3,11 @@ import {
   Controller,
   Get,
   Post,
-  Request,
+  Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dtos';
 import { UserEntity } from 'src/entities';
@@ -28,8 +28,8 @@ export class AuthController {
   }
 
   @Get('get-profile')
-  @UseGuards(AuthGuard('jwt'))
-  async getProfile(@GetUser() user: UserEntity): Promise<UserEntity> {
-    return user;
+  @UseGuards(AuthGuard)
+  async getProfile(@Req() req: any): Promise<UserEntity> {
+    return req['user'];
   }
 }
