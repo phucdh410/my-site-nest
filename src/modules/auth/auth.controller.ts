@@ -10,7 +10,6 @@ import {
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dtos';
-import { UserEntity } from 'src/entities';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +28,7 @@ export class AuthController {
 
   @Get('get-profile')
   @UseGuards(AuthGuard)
-  async getProfile(@Req() req: any): Promise<UserEntity> {
+  async getProfile(@Req() req: any) {
     return req['user'];
   }
 }
