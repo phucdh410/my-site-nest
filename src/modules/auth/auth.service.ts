@@ -3,7 +3,7 @@ import { UserEntity } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { LoginRequestDto, LoginResponseDto } from './dtos';
+import { LoginRequestDto, LoginResponseDto, ProfileDto } from './dtos';
 import { HttpResponse } from 'src/types';
 import { returnObjects } from 'src/utils/funcs';
 
@@ -32,5 +32,15 @@ export class AuthService {
 
     const access_token = await this.jwtService.signAsync(payload);
     return returnObjects({ access_token });
+  }
+
+  async profile(username: string): Promise<HttpResponse<ProfileDto>> {
+    const foundUser = await this.userRepository.findOne({
+      where: { username },
+    });
+
+    delete foundUser.password;
+
+    return returnObjects(foundUser);
   }
 }
