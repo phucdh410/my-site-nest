@@ -12,8 +12,10 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+
     @InjectRepository(SessionEntity)
     private sessionReposity: Repository<SessionEntity>,
+
     private jwtService: JwtService,
   ) {}
 
