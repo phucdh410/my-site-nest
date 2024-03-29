@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from 'src/entities';
+import { SessionEntity, UserEntity } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +12,8 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(SessionEntity)
+    private sessionReposity: Repository<SessionEntity>,
     private jwtService: JwtService,
   ) {}
 
@@ -31,6 +33,12 @@ export class AuthService {
     const payload = { username: user.username, sub: user.id };
 
     const access_token = await this.jwtService.signAsync(payload);
+
+    await this.sessionReposity.insert({
+      username: user.username,
+      access_token,
+    });
+
     return returnObjects({ access_token });
   }
 
@@ -42,5 +50,21 @@ export class AuthService {
     delete foundUser.password;
 
     return returnObjects(foundUser);
+  }
+
+  async logout(username: string): Promise<any> {
+    const foundSessions = await this.sessionReposity.find({
+      where: { username },
+    });
+
+    foundSessions.forEach(async (session) => {
+      if (!session.logout_at) {
+        await this.sessionReposity.update(session.id, {
+          logout_at: new Date(),
+        });
+      }
+    });
+
+    return returnObjects({ message: 'Logout successfully!' });
   }
 }

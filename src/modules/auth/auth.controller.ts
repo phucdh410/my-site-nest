@@ -33,4 +33,12 @@ export class AuthController {
 
     return this.authService.profile(username);
   }
+
+  @Get('logout')
+  @UseGuards(AuthGuard)
+  async logout(@Req() req: any) {
+    const username = req['user'].username;
+
+    return this.authService.logout(username);
+  }
 }
