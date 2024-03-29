@@ -4,7 +4,9 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth';
 import { SessionEntity, UserEntity } from './entities';
-
+import { FileModule } from './modules/file';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -18,7 +20,12 @@ import { SessionEntity, UserEntity } from './entities';
       synchronize: true,
       retryAttempts: 1,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     AuthModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
