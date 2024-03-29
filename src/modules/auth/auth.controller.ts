@@ -20,7 +20,7 @@ export class AuthController {
     const user = await this.authService.validateUser(request);
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Username hoặc password không hợp lệ.');
     }
 
     return this.authService.login(user);
