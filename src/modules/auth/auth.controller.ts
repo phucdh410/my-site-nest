@@ -5,16 +5,16 @@ import {
   Post,
   Req,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { LoginRequestDto } from './dtos';
+import { Public } from 'src/system/auth';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
   async login(@Body() request: LoginRequestDto) {
     const user = await this.authService.validateUser(request);
@@ -27,7 +27,6 @@ export class AuthController {
   }
 
   @Get('get-profile')
-  @UseGuards(AuthGuard)
   async getProfile(@Req() req: any) {
     const username = req['user'].username;
 
@@ -35,7 +34,6 @@ export class AuthController {
   }
 
   @Get('logout')
-  @UseGuards(AuthGuard)
   async logout(@Req() req: any) {
     const username = req['user'].username;
 

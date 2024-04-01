@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './modules/auth';
+import { AuthGuard, AuthModule } from './modules/auth';
 import { SessionEntity, UserEntity } from './entities';
 import { FileModule } from './modules/file';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,6 +29,12 @@ import { join } from 'path';
     FileModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

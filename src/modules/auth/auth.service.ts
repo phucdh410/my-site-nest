@@ -34,14 +34,24 @@ export class AuthService {
   async login(user: UserEntity): Promise<HttpResponse<LoginResponseDto>> {
     const payload = { username: user.username, sub: user.id };
 
-    const access_token = await this.jwtService.signAsync(payload);
+    const [access_token, refresh_token] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: process.env.ACCESS_SECRET,
+        expiresIn: process.env.ACCESS_EXPIRED,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: process.env.REFRESH_SECRET,
+        expiresIn: process.env.REFRESH_EXPIRED,
+      }),
+    ]);
 
     await this.sessionReposity.insert({
       username: user.username,
       access_token,
+      refresh_token,
     });
 
-    return returnObjects({ access_token });
+    return returnObjects({ access_token, refresh_token });
   }
 
   async profile(username: string): Promise<HttpResponse<ProfileDto>> {
