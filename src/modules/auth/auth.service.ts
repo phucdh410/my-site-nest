@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SessionEntity, UserEntity } from 'src/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { LoginRequestDto, LoginResponseDto, ProfileDto } from './dtos';
+import {
+  GeneratePayloadDto,
+  GeneratedTokenDto,
+  LoginRequestDto,
+  LoginResponseDto,
+  ProfileDto,
+} from './dtos';
 import { HttpResponse } from 'src/types';
 import { returnObjects } from 'src/utils/funcs';
 
@@ -31,9 +37,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: UserEntity): Promise<HttpResponse<LoginResponseDto>> {
-    const payload = { username: user.username, sub: user.id };
-
+  async generateToken(payload: GeneratePayloadDto): Promise<GeneratedTokenDto> {
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: process.env.ACCESS_SECRET,
@@ -44,6 +48,14 @@ export class AuthService {
         expiresIn: process.env.REFRESH_EXPIRED,
       }),
     ]);
+
+    return { access_token, refresh_token };
+  }
+
+  async login(user: UserEntity): Promise<HttpResponse<LoginResponseDto>> {
+    const payload = { username: user.username, sub: user.id };
+
+    const { access_token, refresh_token } = await this.generateToken(payload);
 
     await this.sessionReposity.insert({
       username: user.username,
@@ -78,5 +90,26 @@ export class AuthService {
     });
 
     return returnObjects({ message: 'Logout successfully!' });
+  }
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      const user = this.jwtService.verify(token, {
+        secret: process.env.REFRESH_SECRET,
+      });
+      const payload = { username: user.username, sub: user.id };
+
+      const { access_token, refresh_token } = await this.generateToken(payload);
+
+      await this.sessionReposity.insert({
+        username: user.username,
+        access_token,
+        refresh_token,
+      });
+
+      return returnObjects({ access_token, refresh_token });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token!');
+    }
   }
 }

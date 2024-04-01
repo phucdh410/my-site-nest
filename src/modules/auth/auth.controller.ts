@@ -39,4 +39,12 @@ export class AuthController {
 
     return this.authService.logout(username);
   }
+
+  @Public()
+  @Post('refresh')
+  async refresh(@Req() req: any) {
+    const refresh_token = req?.body?.refresh_token;
+
+    return await this.authService.verifyToken(refresh_token);
+  }
 }
