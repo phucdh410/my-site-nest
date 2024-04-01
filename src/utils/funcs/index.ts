@@ -13,3 +13,12 @@ export const returnObjects = <T>(
     errors: errors ?? null,
   };
 };
+
+export const destructureFile = (originalName: string) => {
+  const index = originalName.lastIndexOf('.');
+
+  const name = originalName.substring(0, index);
+  const extension = originalName.substring(index + 1);
+
+  return { name, extension };
+};

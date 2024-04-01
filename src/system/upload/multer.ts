@@ -1,14 +1,12 @@
 import * as multer from 'multer';
+import { destructureFile } from 'src/utils/funcs';
 
 export const storage = multer.diskStorage({
   destination: './uploads',
   filename: (req, file, callback) => {
-    const parts = file.originalname.split('.');
-
-    const fileName = parts[0];
-    const extension = parts[1];
+    const { name, extension } = destructureFile(file.originalname);
 
     const suffix = Date.now() + Math.round(Math.random() * 1e9);
-    callback(null, `${fileName}-${suffix}.${extension}`);
+    callback(null, `${name}-${suffix}.${extension}`);
   },
 });
