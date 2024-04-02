@@ -13,6 +13,9 @@ export class UserEntity {
   password: string;
 
   @Column()
+  fullname: string;
+
+  @Column()
   address: string;
 
   @Column()
