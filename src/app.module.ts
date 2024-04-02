@@ -12,11 +12,11 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Phuc@410',
-      database: 'my-site',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [UserEntity, SessionEntity],
       synchronize: true,
       retryAttempts: 1,
